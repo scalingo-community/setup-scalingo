@@ -1,0 +1,163 @@
+name: Scalingo Install CLI Action
+description: Install and configure the Scalingo CLI so you can deploy and manage your apps on Scalingo.
+inputs:
+  api_token:
+    description: 'Scalingo API token'
+    required: false
+  region:
+    description: 'Region of the Scalingo app'
+    required: true
+  version:
+    description: 'Scalingo CLI version to install'
+    required: false
+    default: 'latest'
+  app_name: 
+    description: 'Name of the Scalingo app'
+    required: false
+
+  # TODO: git setup
+  # git_setup: 
+  #   description: 'Add a Git remote to allow git operations (requires the `region` and `app_name` inputs)'
+  #   required: false
+  #   default: false
+
+  # Options for debugging or internal use
+  scalingo_api_url:
+    description: 'Scalingo API URL'
+    required: false
+  scalingo_auth_url:
+    description: 'Scalingo Auth URL'
+    required: false
+  unsecure_ssl:
+    description: 'Disable SSL verification'
+    required: false
+runs:
+  using: "composite"
+  steps:
+    - name: Install Scalingo CLI
+      run: |
+        echo "-----> Installing Scalingo client..."
+
+        if [ "x$DEBUG" = "xtrue" ] ; then
+          set -x
+        fi
+
+        os=$(uname -s | tr '[A-Z]' '[a-z]')
+        ext='tar.gz'
+        if [ "$os" != "linux" ] && [ "$os" != "darwin" ]; then
+          echo "Unsupported OS: $(uname -s)"
+          exit 1
+        fi
+
+        echo "-----> Platform detected: $os"
+
+        arch=$(uname -m)
+        case $arch in
+          x86_64)
+            arch=amd64
+            ;;
+          aarch64)
+            arch=arm64
+            ;;
+          i686)
+            arch=386
+            ;;
+        esac
+
+        echo "-----> Architecture detected: $arch"
+
+        tmpdir=$(mktemp -d /tmp/scalingo_cli_XXX)
+
+        if [[ "${SCALINGO_CLI_VERSION}" == "latest" ]]; then
+          version=$(curl --silent https://cli-dl.scalingo.com/version | tr -d ' \t\n')
+        else
+          version="${SCALINGO_CLI_VERSION}"
+        fi
+        
+        if [ -z "$version" ]; then
+          echo "-----> Fail to get the version of the CLI" >&2
+          echo "You should use the 'version' input with the desired version." >&2
+          exit 1
+        fi
+
+        echo "-----> Version of the CLI to install: $version"
+
+        dirname="scalingo_${version}_${os}_${arch}"
+        archive_name="${dirname}.${ext}"
+        url=https://github.com/Scalingo/cli/releases/download/${version}/${archive_name}
+
+        echo "-----> Downloading Scalingo client...  "
+        curl --silent --fail --location --output ${tmpdir}/${archive_name} ${url}
+        if [ ! -f ${tmpdir}/${archive_name} ]; then
+          echo "" >&2
+          echo "-----> Fail to download the CLI archive" >&2
+          exit 1
+        fi
+        echo "-----> Scalingo client downloaded"
+        echo "-----> Extracting...   "
+        tar -C "${tmpdir}" -x -f "${tmpdir}/${archive_name}"
+
+        exe_path=${tmpdir}/${dirname}/scalingo
+        if [ ! -f "$exe_path" ]; then
+          echo "" >&2
+          echo "-----> Fail to extract the CLI archive" >&2
+          exit 1
+        fi
+        echo "Binary extracted"
+
+        target_dir="${{ github.action_path }}/bin"
+        mkdir "${target_dir}"
+
+        target="${target_dir}/scalingo"
+        
+        mv $exe_path "$target" ; rc=$?
+
+        if [ $rc -ne 0 ] ; then
+          echo " !     Fail to install Scalingo client (return $rc)"
+        else
+          echo "-----> Installation completed, the command 'scalingo' is available."
+        fi
+
+        echo ${{github.action_path}}/bin/ >> ${GITHUB_PATH}
+      shell: bash
+      env:
+        GITHUB_TOKEN: ${{ inputs.github_token }}
+        SCALINGO_CLI_VERSION: ${{ inputs.version }}
+    - name: Configure Scalingo CLI
+      shell: bash
+      run: |
+        echo "-----> Configuration"
+
+        echo "LOG_FILE=/dev/stdout" >> $GITHUB_ENV
+
+        # Disable the update checker
+        echo "DISABLE_UPDATE_CHECKER=true" >> $GITHUB_ENV
+        export DISABLE_UPDATE_CHECKER=true
+        echo "DISABLE_INTERACTIVE=true" >> $GITHUB_ENV
+        export DISABLE_INTERACTIVE=true
+
+        # Configure development urls for debugging purposes
+        [[ -n "${UNSECURE_SSL}" ]] && echo "UNSECURE_SSL=${UNSECURE_SSL}" >> $GITHUB_ENV
+        [[ -n "${SCALINGO_API_URL}" ]] && echo "SCALINGO_API_URL=${SCALINGO_API_URL}" >> $GITHUB_ENV
+        [[ -n "${SCALINGO_AUTH_URL}" ]] && echo "SCALINGO_AUTH_URL=${SCALINGO_AUTH_URL}" >> $GITHUB_ENV
+
+        echo "-----> Set the region to ${SCALINGO_REGION}"
+        echo "SCALINGO_REGION=${SCALINGO_REGION}" >> $GITHUB_ENV
+
+        if [[ -n "${SCALINGO_API_TOKEN}" ]]; then
+          echo "-----> Log in to Scalingo with API token"
+          scalingo login --api-token ${SCALINGO_API_TOKEN} >&1 2>&1
+          scalingo config --region ${SCALINGO_REGION} >&1 2>&1
+        fi
+
+        if [[ -n "${SCALINGO_APP}" ]]; then
+          echo "-----> Set the default app to ${SCALINGO_APP}"
+          echo "SCALINGO_APP=${SCALINGO_APP}" >> $GITHUB_ENV
+        fi
+      env:
+        SCALINGO_API_TOKEN: ${{ inputs.api_token }}
+        SCALINGO_REGION: ${{ inputs.region }}
+        SCALINGO_APP: ${{ inputs.app_name }}
+        SCALINGO_API_URL: ${{ inputs.scalingo_api_url }}
+        SCALINGO_AUTH_URL: ${{ inputs.scalingo_auth_url }}
+        UNSECURE_SSL: ${{ inputs.unsecure_ssl }}
