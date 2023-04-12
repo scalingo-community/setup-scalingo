@@ -31,6 +31,12 @@ inputs:
   unsecure_ssl:
     description: 'Disable SSL verification'
     required: false
+  scalingo_db_url:
+    description: 'Scalingo DB URL'
+    required: false
+  scalingo_ssh_host:
+    description: 'Scalingo SSH Host'
+    required: false
 runs:
   using: "composite"
   steps:
@@ -126,7 +132,7 @@ runs:
     - name: Configure Scalingo CLI
       shell: bash
       run: |
-        echo "-----> Configuration"
+        echo "-----> Configuring Scalingo CLI"
 
         echo "LOG_FILE=/dev/stdout" >> $GITHUB_ENV
 
@@ -140,6 +146,8 @@ runs:
         [[ -n "${UNSECURE_SSL}" ]] && echo "UNSECURE_SSL=${UNSECURE_SSL}" >> $GITHUB_ENV
         [[ -n "${SCALINGO_API_URL}" ]] && echo "SCALINGO_API_URL=${SCALINGO_API_URL}" >> $GITHUB_ENV
         [[ -n "${SCALINGO_AUTH_URL}" ]] && echo "SCALINGO_AUTH_URL=${SCALINGO_AUTH_URL}" >> $GITHUB_ENV
+        [[ -n "${SCALINGO_DB_URL}" ]] && echo "SCALINGO_DB_URL=${SCALINGO_DB_URL}" >> $GITHUB_ENV
+        [[ -n "${SCALINGO_SSH_HOST}" ]] && echo "SCALINGO_SSH_HOST=${SCALINGO_SSH_HOST}" >> $GITHUB_ENV
 
         echo "-----> Set the region to ${SCALINGO_REGION}"
         echo "SCALINGO_REGION=${SCALINGO_REGION}" >> $GITHUB_ENV
@@ -160,4 +168,6 @@ runs:
         SCALINGO_APP: ${{ inputs.app_name }}
         SCALINGO_API_URL: ${{ inputs.scalingo_api_url }}
         SCALINGO_AUTH_URL: ${{ inputs.scalingo_auth_url }}
+        SCALINGO_DB_URL: ${{ inputs.scalingo_db_url }}
+        SCALINGO_SSH_HOST: ${{ inputs.scalingo_ssh_host }}
         UNSECURE_SSL: ${{ inputs.unsecure_ssl }}
