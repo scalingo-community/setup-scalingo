@@ -130,7 +130,7 @@ runs:
     - name: Configure Scalingo CLI
       shell: bash
       run: |
-        echo "------> Configuring Scalingo CLI"
+        echo "-----> Configuration"
 
         echo "LOG_FILE=/dev/stdout" >> $GITHUB_ENV
 
