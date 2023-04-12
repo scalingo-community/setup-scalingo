@@ -19,16 +19,7 @@ steps:
     region: 'osc-fr1'
 ```
 
-A specific version of Scalingo CLI can be installed:
-```
-steps:
-- uses: scalingo-community/setup-scalingo@v1
-  with:
-    region: 'osc-fr1'
-    version: 1.28.2
-```
-
-Subsequent steps can launch command with the configured CLI:
+Subsequent steps can launch command with the configured and authenticated CLI (you can create API Token [in the Scalingo dashboard](https://dashboard.scalingo.com/account/tokens)):
 ```
 steps:
 - uses: scalingo-community/setup-scalingo@v1
@@ -36,7 +27,17 @@ steps:
     region: 'osc-fr1'
     api_token: '${{ secrets.scalingo_api_token }}
     app_name: 'my_app'
+
 - run: scalingo restart # will restart all the processes of the app "my_app" in region "osc-fr1"
+```
+
+A specific version of Scalingo CLI can be installed:
+```
+steps:
+- uses: scalingo-community/setup-scalingo@v1
+  with:
+    region: 'osc-fr1'
+    version: 1.28.2
 ```
 
 ## Inputs
@@ -49,12 +50,15 @@ The action also accepts the following optional inputs:
 - `api_token` - The Scalingo API token to use. If not provided, the subsequent steps  will try to use the `SCALINGO_API_TOKEN` environment variable.
 - `version` - The version of Scalingo CLI to install. If not provided, the action will install the latest version.
 - `app_name` - The name of the app to use. If not provided, the subsequent steps will try to use the `SCALINGO_APP` environment variable.
-- `git_setup` - Add a Git remote to allow git operations (requires the `region` and `app_name` inputs). If not provided, the action will not add a Git remote.
 
-For testing or debugging purpose, the following inputs can alos be used:
+For testing or debugging purpose, the following inputs can also be used:
 
 - `scalingo_api_url` - The Scalingo API URL to use. If not provided, the action will use the default API URL for the given region.
 - `scalingo_auth_url` - The Scalingo Auth URL to use. If not provided, the action will use the default Auth URL for the given region.
 - `unsecure_ssl` - Disable SSL verification with APIs.
 - `scalingo_db_url` - The Scalingo DB URL to use. If not provided, the action will use the default DB URL for the given region.
 - `scalingo_ssh_host` - The Scalingo SSH Host to use. If not provided, the action will use the default SSH Host for the given region.
+
+TODO:
+
+- [ ] `git_setup` (not implemented) - Add a Git remote to allow git operations (requires the `region` and `app_name` inputs). If not provided, the action will not add a Git remote.
