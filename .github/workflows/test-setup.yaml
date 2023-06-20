@@ -13,14 +13,14 @@ jobs:
   test-latest-version:
     strategy:
       matrix:
-        os: [ubuntu-20.04, ubuntu-22.04, ubuntu-latest, macos-11, macos-12, macos-latest]
+        os: [ubuntu-20.04, ubuntu-22.04, ubuntu-latest, macos-11, macos-12]
     runs-on: ${{ matrix.os }}
 
     steps:
       - name: Checkout
         uses: actions/checkout@v3
       - name: Setup scalingo CLI
-        uses: ./setup-scalingo
+        uses: ./
         with:
           region: 'osc-fr1'
       - name: Check version
@@ -39,14 +39,14 @@ jobs:
   test-specific-version:
     strategy:
       matrix:
-        os: [ubuntu-20.04, ubuntu-22.04, ubuntu-latest, macos-11, macos-12, macos-latest]
+        os: [ubuntu-20.04, ubuntu-22.04, ubuntu-latest, macos-11, macos-12]
     runs-on: ${{ matrix.os }}
 
     steps:
       - name: Checkout
         uses: actions/checkout@v3
       - name: Setup scalingo CLI
-        uses: ./setup-scalingo
+        uses: ./
         with:
           version: 1.28.1
           region: 'osc-fr1'
@@ -64,14 +64,14 @@ jobs:
     if: ${{ github.repository == 'scalingo-community/scalingo-actions' }}
     strategy:
       matrix:
-        os: [ubuntu-20.04, ubuntu-22.04, ubuntu-latest, macos-11, macos-12, macos-latest]
+        os: [ubuntu-20.04, ubuntu-22.04, ubuntu-latest, macos-11, macos-12]
     runs-on: ${{ matrix.os }}
 
     steps:
       - name: Checkout
         uses: actions/checkout@v3
       - name: Setup scalingo CLI
-        uses: ./setup-scalingo
+        uses: ./
         with:
           region: 'osc-fr1'
           api_token: ${{ secrets.SCALINGO_API_TOKEN }}
