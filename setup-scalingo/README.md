@@ -31,14 +31,7 @@ steps:
 - run: scalingo restart # will restart all the processes of the app "my_app" in region "osc-fr1"
 ```
 
-A specific version of Scalingo CLI can be installed:
-```
-steps:
-- uses: scalingo-community/setup-scalingo@v1
-  with:
-    region: 'osc-fr1'
-    version: 1.28.2
-```
+
 
 ## Inputs
 The action requires the following inputs:
@@ -50,6 +43,8 @@ The action also accepts the following optional inputs:
 - `api_token` - The Scalingo API token to use. If not provided, the subsequent steps  will try to use the `SCALINGO_API_TOKEN` environment variable.
 - `version` - The version of Scalingo CLI to install. If not provided, the action will install the latest version.
 - `app_name` - The name of the app to use. If not provided, the subsequent steps will try to use the `SCALINGO_APP` environment variable.
+- `git_remote` - Choose the name of Git remote to allow git operations (requires the `region` and `app_name` inputs). The default value is `scalingo`.
+
 
 For testing or debugging purpose, the following inputs can also be used:
 
@@ -59,6 +54,33 @@ For testing or debugging purpose, the following inputs can also be used:
 - `scalingo_db_url` - The Scalingo DB URL to use. If not provided, the action will use the default DB URL for the given region.
 - `scalingo_ssh_host` - The Scalingo SSH Host to use. If not provided, the action will use the default SSH Host for the given region.
 
-TODO:
+## Features
 
-- [ ] `git_setup` (not implemented) - Add a Git remote to allow git operations (requires the `region` and `app_name` inputs). If not provided, the action will not add a Git remote.
+### Git remote auto-configuration
+
+If the code  you provide the `region` and `app_name` inputs, the action will automatically configure a Git remote named `scalingo` to allow git operations on your app. This is useful if you want to run `git push scalingo master` in your workflow.
+
+```
+steps:
+- name: Checkout code
+  uses: actions/checkout@v3
+- Configure Scalingo CLI
+  uses: scalingo-community/setup-scalingo@v1
+  with:
+    region: 'osc-fr1'
+    app_name: 'my_app'
+- name: Deploy to Scalingo with Git
+  run: git push scalingo main
+```
+
+### Custom version of Scalingo CLI
+
+You can install a specific version of Scalingo CLI:
+```
+steps:
+- uses: scalingo-community/setup-scalingo@v1
+  with:
+    region: 'osc-fr1'
+    version: 1.28.2
+```
+

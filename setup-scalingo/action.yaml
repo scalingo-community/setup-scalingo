@@ -14,12 +14,10 @@ inputs:
   app_name: 
     description: 'Name of the Scalingo app'
     required: false
-
-  # TODO: git setup
-  # git_setup: 
-  #   description: 'Add a Git remote to allow git operations (requires the `region` and `app_name` inputs)'
-  #   required: false
-  #   default: false
+  git_remote: 
+    description: 'Choose the name of Git remote to allow git operations (requires the `region` and `app_name` inputs)'
+    required: false
+    default: 'scalingo'
 
   # Options for debugging or internal use
   scalingo_api_url:
@@ -42,7 +40,7 @@ runs:
   steps:
     - name: Install Scalingo CLI
       run: |
-        echo "-----> Installing Scalingo client..."
+        echo "------> Installing Scalingo client..."
 
         if [ "x$DEBUG" = "xtrue" ] ; then
           set -x
@@ -55,7 +53,7 @@ runs:
           exit 1
         fi
 
-        echo "-----> Platform detected: $os"
+        echo "------> Platform detected: $os"
 
         arch=$(uname -m)
         case $arch in
@@ -70,7 +68,7 @@ runs:
             ;;
         esac
 
-        echo "-----> Architecture detected: $arch"
+        echo "------> Architecture detected: $arch"
 
         tmpdir=$(mktemp -d /tmp/scalingo_cli_XXX)
 
@@ -81,32 +79,32 @@ runs:
         fi
         
         if [ -z "$version" ]; then
-          echo "-----> Fail to get the version of the CLI" >&2
+          echo "------> Fail to get the version of the CLI" >&2
           echo "You should use the 'version' input with the desired version." >&2
           exit 1
         fi
 
-        echo "-----> Version of the CLI to install: $version"
+        echo "------> Version of the CLI to install: $version"
 
         dirname="scalingo_${version}_${os}_${arch}"
         archive_name="${dirname}.${ext}"
         url=https://github.com/Scalingo/cli/releases/download/${version}/${archive_name}
 
-        echo "-----> Downloading Scalingo client...  "
+        echo "------> Downloading Scalingo client...  "
         curl --silent --fail --location --output ${tmpdir}/${archive_name} ${url}
         if [ ! -f ${tmpdir}/${archive_name} ]; then
           echo "" >&2
-          echo "-----> Fail to download the CLI archive" >&2
+          echo "ERROR-> Fail to download the CLI archive" >&2
           exit 1
         fi
-        echo "-----> Scalingo client downloaded"
-        echo "-----> Extracting...   "
+        echo "------> Scalingo client downloaded"
+        echo "------> Extracting...   "
         tar -C "${tmpdir}" -x -f "${tmpdir}/${archive_name}"
 
         exe_path=${tmpdir}/${dirname}/scalingo
         if [ ! -f "$exe_path" ]; then
           echo "" >&2
-          echo "-----> Fail to extract the CLI archive" >&2
+          echo "------> Fail to extract the CLI archive" >&2
           exit 1
         fi
         echo "Binary extracted"
@@ -121,7 +119,7 @@ runs:
         if [ $rc -ne 0 ] ; then
           echo " !     Fail to install Scalingo client (return $rc)"
         else
-          echo "-----> Installation completed, the command 'scalingo' is available."
+          echo "------> Installation completed, the command 'scalingo' is available."
         fi
 
         echo ${{github.action_path}}/bin/ >> ${GITHUB_PATH}
@@ -132,7 +130,7 @@ runs:
     - name: Configure Scalingo CLI
       shell: bash
       run: |
-        echo "-----> Configuring Scalingo CLI"
+        echo "------> Configuring Scalingo CLI"
 
         echo "LOG_FILE=/dev/stdout" >> $GITHUB_ENV
 
@@ -149,17 +147,17 @@ runs:
         [[ -n "${SCALINGO_DB_URL}" ]] && echo "SCALINGO_DB_URL=${SCALINGO_DB_URL}" >> $GITHUB_ENV
         [[ -n "${SCALINGO_SSH_HOST}" ]] && echo "SCALINGO_SSH_HOST=${SCALINGO_SSH_HOST}" >> $GITHUB_ENV
 
-        echo "-----> Set the region to ${SCALINGO_REGION}"
+        echo "------> Set the region to ${SCALINGO_REGION}"
         echo "SCALINGO_REGION=${SCALINGO_REGION}" >> $GITHUB_ENV
 
         if [[ -n "${SCALINGO_API_TOKEN}" ]]; then
-          echo "-----> Log in to Scalingo with API token"
+          echo "------> Log in to Scalingo with API token"
           scalingo login --api-token ${SCALINGO_API_TOKEN} >&1 2>&1
           scalingo config --region ${SCALINGO_REGION} >&1 2>&1
         fi
 
         if [[ -n "${SCALINGO_APP}" ]]; then
-          echo "-----> Set the default app to ${SCALINGO_APP}"
+          echo "------> Set the default app to ${SCALINGO_APP}"
           echo "SCALINGO_APP=${SCALINGO_APP}" >> $GITHUB_ENV
         fi
       env:
@@ -171,3 +169,28 @@ runs:
         SCALINGO_DB_URL: ${{ inputs.scalingo_db_url }}
         SCALINGO_SSH_HOST: ${{ inputs.scalingo_ssh_host }}
         UNSECURE_SSL: ${{ inputs.unsecure_ssl }}
+
+    - name: Configure Scalingo Git remote
+      shell: bash
+      run: |
+        echo "------> Configure Scalingo Git remote"
+
+        if [ -z $SCALINGO_APP ]; then
+          echo "------> No region. The git remote cannot be configured without a region."
+          exit 0
+        fi
+
+        if [ -z $SCALINGO_REGION }}" ]; then
+          echo "WARNING: No app name. The git remote cannot be configured without an app name."
+          exit 0
+        fi
+
+        # Configure the git remote only if .git directory exists
+        if [ ! -d .git ]; then
+          echo "------> No .git directory found, skipping git remote configuration"
+        fi
+
+        scalingo git-setup --remote ${{ inputs.git_remote }}
+        echo "------> Git remote \"${{ inputs.git_remote }}\" configured"
+
+
