@@ -1,0 +1,85 @@
+name: Tests suite for "setup-scalingo"
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+
+  # Test that the action installs the CLI
+  # and that the scalingo CLI returns its version number
+  test-latest-version:
+    strategy:
+      matrix:
+        os: [ubuntu-20.04, ubuntu-22.04, ubuntu-latest, macos-11, macos-12, macos-latest]
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Setup scalingo CLI
+        uses: ./setup-scalingo
+        with:
+          region: 'osc-fr1'
+      - name: Check version
+        run: |
+          # given
+          latest_version=$(curl -sL https://cli-dl.scalingo.com/version)
+          # when
+          installed_version=$(scalingo --version) 
+          # then
+          echo $latest_version
+          echo $installed_version
+          echo "${installed_version}" | grep -q "${latest_version}"
+    
+  # Test that the action installs a specific version of the CLI 
+  # and that the scalingo CLI returns its version number
+  test-specific-version:
+    strategy:
+      matrix:
+        os: [ubuntu-20.04, ubuntu-22.04, ubuntu-latest, macos-11, macos-12, macos-latest]
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Setup scalingo CLI
+        uses: ./setup-scalingo
+        with:
+          version: 1.28.1
+          region: 'osc-fr1'
+      - name: Check version
+        run: |
+          # given
+          wanted_version=1.28.1
+          # when
+          installed_version=$(scalingo --version)
+          # then
+          echo "${installed_version}" | grep -q "${wanted_version}"
+    
+  # Test that the installed CLI is logged when the API Token is provided
+  test-login:
+    if: ${{ github.repository == 'scalingo-community/scalingo-actions' }}
+    strategy:
+      matrix:
+        os: [ubuntu-20.04, ubuntu-22.04, ubuntu-latest, macos-11, macos-12, macos-latest]
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Setup scalingo CLI
+        uses: ./setup-scalingo
+        with:
+          region: 'osc-fr1'
+          api_token: ${{ secrets.SCALINGO_API_TOKEN }}
+      - name: Check login
+        run: |
+          # given
+          expected_username="${{ secrets.SCALINGO_USERNAME }}"
+          # when
+          logged_user=$(scalingo whoami)
+          # then
+          echo "${logged_user}" | grep -q "${expected_username}"
