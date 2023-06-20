@@ -1,0 +1,19 @@
+name: 'Deploy Scalingo App'
+description: 'Provide a description here'
+author: 'Scalingo-Community'
+inputs:
+  branch:
+    description: 'Branch to deploy (use the current branch by default)'
+    required: false
+  api_token:
+    description: 'Scalingo API token'
+    required: false
+  region:
+    description: 'Region of the Scalingo app'
+    required: false
+  app_name: 
+    description: 'Name of the Scalingo app'
+    required: false
+runs:
+  using: 'node16'
+  main: 'dist/index.js'
