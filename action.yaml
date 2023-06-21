@@ -183,7 +183,7 @@ runs:
           exit 0
         fi
 
-        if [ -z $SCALINGO_REGION }}" ]; then
+        if [ -z $SCALINGO_REGION ]; then
           echo "WARNING: No app name. The git remote cannot be configured without an app name."
           exit 0
         fi
@@ -191,6 +191,7 @@ runs:
         # Configure the git remote only if .git directory exists
         if [ ! -d .git ]; then
           echo "------> No .git directory found, skipping git remote configuration"
+          exit 0
         fi
 
         scalingo git-setup --remote ${{ inputs.git_remote }}
