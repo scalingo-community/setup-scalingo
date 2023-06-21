@@ -1,5 +1,8 @@
-name: Scalingo Install CLI Action
+name: Scalingo Setup CLI
 description: Install and configure the Scalingo CLI so you can deploy and manage your apps on Scalingo.
+branding:
+  icon: terminal
+  color: blue
 inputs:
   api_token:
     description: 'Scalingo API token'
