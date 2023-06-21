@@ -20,7 +20,7 @@ jobs:
         with:
           release-type: simple
           package-name: ${{ env.ACTION_NAME }}
-          command: github-release
+          token: ${{ secrets.GITHUB_TOKEN }}
       - uses: actions/checkout@v2
         if: ${{ steps.release.outputs.release_created }}
       - name: tag major and minor versions
