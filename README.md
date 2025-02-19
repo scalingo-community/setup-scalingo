@@ -89,6 +89,6 @@ steps:
 - uses: scalingo-community/setup-scalingo@v0.1.1
   with:
     region: 'osc-fr1'
-    version: 1.28.2
+    version: 1.33.0
 ```
 <!-- x-release-please-end -->

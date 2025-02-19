@@ -48,12 +48,12 @@ jobs:
       - name: Setup scalingo CLI
         uses: ./
         with:
-          version: 1.28.1
+          version: 1.33.0
           region: 'osc-fr1'
       - name: Check version
         run: |
           # given
-          wanted_version=1.28.1
+          wanted_version=1.33.0
           # when
           installed_version=$(scalingo --version)
           # then
