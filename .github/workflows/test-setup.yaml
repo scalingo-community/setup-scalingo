@@ -13,7 +13,14 @@ jobs:
   test-latest-version:
     strategy:
       matrix:
-        os: [ubuntu-22.04, ubuntu-24.04, ubuntu-latest, macos-11, macos-12]
+        os: 
+          - ubuntu-22.04
+          - ubuntu-24.04
+          - ubuntu-latest
+          - ubuntu-22.04-arm
+          - ubuntu-24.04-arm
+          - macos-13
+          - macos-latest
     runs-on: ${{ matrix.os }}
 
     steps:
@@ -39,7 +46,14 @@ jobs:
   test-specific-version:
     strategy:
       matrix:
-        os: [ubuntu-22.04, ubuntu-24.04, ubuntu-latest, macos-11, macos-12]
+        os: 
+          - ubuntu-22.04
+          - ubuntu-24.04
+          - ubuntu-latest
+          - ubuntu-22.04-arm
+          - ubuntu-24.04-arm
+          - macos-13
+          - macos-latest
     runs-on: ${{ matrix.os }}
 
     steps:
@@ -64,7 +78,14 @@ jobs:
     if: ${{ github.repository == 'scalingo-community/setup-scalingo' }}
     strategy:
       matrix:
-        os: [ubuntu-22.04, ubuntu-24.04, ubuntu-latest, macos-11, macos-12]
+        os: 
+          - ubuntu-22.04
+          - ubuntu-24.04
+          - ubuntu-latest
+          - ubuntu-22.04-arm
+          - ubuntu-24.04-arm
+          - macos-13
+          - macos-latest
     runs-on: ${{ matrix.os }}
 
     steps:
