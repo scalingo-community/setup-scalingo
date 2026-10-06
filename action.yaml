@@ -178,13 +178,13 @@ runs:
       run: |
         echo "------> Configure Scalingo Git remote"
 
-        if [ -z $SCALINGO_APP ]; then
-          echo "------> No region. The git remote cannot be configured without a region."
+        if [ -z "$SCALINGO_APP" ]; then
+          echo "::warning::No app name. The git remote cannot be configured without an app name (input 'app_name'). Skipping git remote configuration."
           exit 0
         fi
 
-        if [ -z $SCALINGO_REGION ]; then
-          echo "WARNING: No app name. The git remote cannot be configured without an app name."
+        if [ -z "$SCALINGO_REGION" ]; then
+          echo "::warning::No region. The git remote cannot be configured without a region (input 'region'). Skipping git remote configuration."
           exit 0
         fi
 
@@ -194,7 +194,9 @@ runs:
           exit 0
         fi
 
-        scalingo git-setup --remote ${{ inputs.git_remote }}
-        echo "------> Git remote \"${{ inputs.git_remote }}\" configured"
+        scalingo git-setup --remote "$GIT_REMOTE"
+        echo "------> Git remote \"$GIT_REMOTE\" configured"
+      env:
+        GIT_REMOTE: ${{ inputs.git_remote }}
 
 
