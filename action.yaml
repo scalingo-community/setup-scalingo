@@ -155,8 +155,17 @@ runs:
 
         if [[ -n "${SCALINGO_API_TOKEN}" ]]; then
           echo "------> Log in to Scalingo with API token"
-          scalingo login --api-token ${SCALINGO_API_TOKEN} >&1 2>&1
-          scalingo config --region ${SCALINGO_REGION} >&1 2>&1
+          if ! scalingo login --api-token "${SCALINGO_API_TOKEN}" >&1 2>&1; then
+            echo "::error::Scalingo login failed. Check that the 'api_token' input holds a valid API token with access to region '${SCALINGO_REGION}'." >&2
+            exit 1
+          fi
+          if ! scalingo config --region "${SCALINGO_REGION}" >&1 2>&1; then
+            echo "::error::Failed to set Scalingo region to '${SCALINGO_REGION}'. Check that the 'region' input is a valid region (e.g. osc-fr1)." >&2
+            exit 1
+          fi
+          echo "------> Successfully logged in and region set to ${SCALINGO_REGION}"
+        else
+          echo "------> No API token provided, skipping login (subsequent steps can use the SCALINGO_API_TOKEN environment variable)."
         fi
 
         if [[ -n "${SCALINGO_APP}" ]]; then
