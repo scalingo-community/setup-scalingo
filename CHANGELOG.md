@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.3](https://github.com/scalingo-community/setup-scalingo/compare/v0.1.2...v0.1.3) (2026-10-08)
+
+
+### 🐛 Bug fixes
+
+* **ci:** repair the release-please workflow (moving tags) ([#13](https://github.com/scalingo-community/setup-scalingo/issues/13)) ([1a68113](https://github.com/scalingo-community/setup-scalingo/commit/1a6811331c6aa0e3fdbaa3862bc4de3e5a4a6039))
+
 ## [0.1.2](https://github.com/scalingo-community/setup-scalingo/compare/v0.1.1...v0.1.2) (2026-10-08)
 
 
