@@ -116,16 +116,14 @@ runs:
         mkdir "${target_dir}"
 
         target="${target_dir}/scalingo"
-        
-        mv $exe_path "$target" ; rc=$?
 
-        if [ $rc -ne 0 ] ; then
-          echo " !     Fail to install Scalingo client (return $rc)"
-        else
-          echo "------> Installation completed, the command 'scalingo' is available."
+        if ! mv "$exe_path" "$target"; then
+          echo "::error::Fail to install Scalingo client. Could not move '$exe_path' to '$target'. Check disk space and permissions, then re-run the job." >&2
+          exit 1
         fi
+        echo "------> Installation completed, the command 'scalingo' is available at $target."
 
-        echo ${{github.action_path}}/bin/ >> ${GITHUB_PATH}
+        echo "${{ github.action_path }}/bin/" >> "${GITHUB_PATH}"
       shell: bash
       env:
         GITHUB_TOKEN: ${{ inputs.github_token }}
