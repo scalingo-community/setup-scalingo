@@ -13,20 +13,19 @@ After you've used the action, subsequent steps in the same job can run arbitrary
 This action can be run on `ubuntu-latest` and `macos-latest` GitHub Actions runners. Note that the `region` input is always required.
 
 The default configuration installs the latest version of Scalingo CLI:
-<!-- x-release-please-start-version -->
 ```yaml
 steps:
-- uses: scalingo-community/setup-scalingo@v0.1.1
+- uses: scalingo-community/setup-scalingo@v0.1
   with:
     region: 'osc-fr1'
 ```
-<!-- x-release-please-end -->
+
+The examples below use the `@v0.1` moving tag, which is updated at each release. You can also use `@v0` to follow the latest minor version, or pin an exact version from the [releases page](https://github.com/scalingo-community/setup-scalingo/releases).
 
 Subsequent steps can launch command with the configured and authenticated CLI (you can create API Token [in the Scalingo dashboard](https://dashboard.scalingo.com/account/tokens)):
-<!-- x-release-please-start-version -->
 ```yaml
 steps:
-- uses: scalingo-community/setup-scalingo@v0.1.1
+- uses: scalingo-community/setup-scalingo@v0.1
   with:
     region: 'osc-fr1'
     api_token: ${{ secrets.scalingo_api_token }}
@@ -34,7 +33,6 @@ steps:
 
 - run: scalingo restart # will restart all the processes of the app "my_app" in region "osc-fr1"
 ```
-<!-- x-release-please-end -->
 
 
 ## Inputs
@@ -64,31 +62,27 @@ For testing or debugging purpose, the following inputs can also be used:
 ### Git remote auto-configuration
 
 If the code  you provide the `region` and `app_name` inputs, the action will automatically configure a Git remote named `scalingo` to allow git operations on your app. This is useful if you want to run `git push scalingo master` in your workflow.
-<!-- x-release-please-start-version -->
 ```yaml
 steps:
 - name: Checkout code
   uses: actions/checkout@v3
 - name: Configure Scalingo CLI
-  uses: scalingo-community/setup-scalingo@v0.1.1
+  uses: scalingo-community/setup-scalingo@v0.1
   with:
     region: 'osc-fr1'
     app_name: 'my_app'
 - name: Deploy to Scalingo with Git
   run: git push scalingo main
 ```
-<!-- x-release-please-end -->
 
 
 ### Custom version of Scalingo CLI
 
 You can install a specific version of Scalingo CLI:
-<!-- x-release-please-start-version -->
 ```yaml
 steps:
-- uses: scalingo-community/setup-scalingo@v0.1.1
+- uses: scalingo-community/setup-scalingo@v0.1
   with:
     region: 'osc-fr1'
     version: 1.33.0
 ```
-<!-- x-release-please-end -->
