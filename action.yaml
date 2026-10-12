@@ -73,7 +73,12 @@ runs:
 
         echo "------> Architecture detected: $arch"
 
-        tmpdir=$(mktemp -d /tmp/scalingo_cli_XXX)
+        # Use the runner-managed temp directory when available, with a
+        # portable fallback. More Xs in the template avoid collisions.
+        tmpdir=$(mktemp -d "${RUNNER_TEMP:-${TMPDIR:-/tmp}}/scalingo_cli_XXXXXX")
+
+        # Remove the temp directory on exit, whatever the outcome.
+        trap 'rm -rf "$tmpdir"' EXIT
 
         if [[ "${SCALINGO_CLI_VERSION}" == "latest" ]]; then
           version=$(curl --silent https://cli-dl.scalingo.com/version | tr -d ' \t\n')
@@ -91,11 +96,11 @@ runs:
 
         dirname="scalingo_${version}_${os}_${arch}"
         archive_name="${dirname}.${ext}"
-        url=https://github.com/Scalingo/cli/releases/download/${version}/${archive_name}
+        url="https://github.com/Scalingo/cli/releases/download/${version}/${archive_name}"
 
         echo "------> Downloading Scalingo client...  "
-        curl --silent --fail --location --output ${tmpdir}/${archive_name} ${url}
-        if [ ! -f ${tmpdir}/${archive_name} ]; then
+        curl --silent --fail --location --output "${tmpdir}/${archive_name}" "${url}"
+        if [ ! -f "${tmpdir}/${archive_name}" ]; then
           echo "" >&2
           echo "ERROR-> Fail to download the CLI archive" >&2
           exit 1
@@ -104,7 +109,7 @@ runs:
         echo "------> Extracting...   "
         tar -C "${tmpdir}" -x -f "${tmpdir}/${archive_name}"
 
-        exe_path=${tmpdir}/${dirname}/scalingo
+        exe_path="${tmpdir}/${dirname}/scalingo"
         if [ ! -f "$exe_path" ]; then
           echo "" >&2
           echo "------> Fail to extract the CLI archive" >&2
