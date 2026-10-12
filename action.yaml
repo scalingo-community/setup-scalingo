@@ -113,7 +113,7 @@ runs:
         echo "Binary extracted"
 
         target_dir="${{ github.action_path }}/bin"
-        mkdir "${target_dir}"
+        mkdir -p "${target_dir}"
 
         target="${target_dir}/scalingo"
 
