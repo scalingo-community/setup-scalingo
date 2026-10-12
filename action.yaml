@@ -87,7 +87,7 @@ runs:
         trap 'rm -rf "$tmpdir"' EXIT
 
         if [[ "${SCALINGO_CLI_VERSION}" == "latest" ]]; then
-          version=$(curl --silent https://cli-dl.scalingo.com/version | tr -d ' \t\n')
+          version=$(curl --silent --proto '=https' --tlsv1.2 https://cli-dl.scalingo.com/version | tr -d ' \t\n')
         else
           version="${SCALINGO_CLI_VERSION}"
         fi
@@ -102,16 +102,48 @@ runs:
 
         dirname="scalingo_${version}_${os}_${arch}"
         archive_name="${dirname}.${ext}"
-        url="https://github.com/Scalingo/cli/releases/download/${version}/${archive_name}"
+        base_url="https://github.com/Scalingo/cli/releases/download/${version}"
+        url="${base_url}/${archive_name}"
+        checksums_url="${base_url}/checksums.txt"
+
+        # Download from GitHub with authentication when a token is available,
+        # to avoid the anonymous rate limit.
+        download_from_github() {
+          local out="$1" dl_url="$2"
+          if [ -n "${GITHUB_TOKEN:-}" ]; then
+            curl --silent --fail --location --retry 3 --retry-all-errors --retry-delay 2 --proto '=https' --header "Authorization: Bearer ${GITHUB_TOKEN}" --output "$out" "$dl_url"
+          else
+            curl --silent --fail --location --retry 3 --retry-all-errors --retry-delay 2 --proto '=https' --output "$out" "$dl_url"
+          fi
+        }
 
         echo "------> Downloading Scalingo client...  "
-        curl --silent --fail --location --retry 3 --retry-all-errors --retry-delay 2 --output "${tmpdir}/${archive_name}" "${url}"
+        download_from_github "${tmpdir}/${archive_name}" "${url}"
         if [ ! -f "${tmpdir}/${archive_name}" ]; then
           echo "" >&2
           echo "ERROR-> Fail to download the CLI archive" >&2
           exit 1
         fi
         echo "------> Scalingo client downloaded"
+
+        echo "------> Verifying checksum...  "
+        download_from_github "${tmpdir}/checksums.txt" "${checksums_url}"
+        expected_checksum=$(grep -E " ${archive_name}\$" "${tmpdir}/checksums.txt" | awk '{print $1}')
+        if [ -z "$expected_checksum" ]; then
+          echo "::error::No checksum found for '${archive_name}' in checksums.txt. The release assets may have changed." >&2
+          exit 1
+        fi
+        if command -v sha256sum > /dev/null 2>&1; then
+          computed_checksum=$(sha256sum "${tmpdir}/${archive_name}" | awk '{print $1}')
+        else
+          computed_checksum=$(shasum -a 256 "${tmpdir}/${archive_name}" | awk '{print $1}')
+        fi
+        if [ "$computed_checksum" != "$expected_checksum" ]; then
+          echo "::error::Checksum mismatch for the Scalingo CLI archive. Expected: ${expected_checksum}, got: ${computed_checksum}. The download may have been tampered with or corrupted." >&2
+          exit 1
+        fi
+        echo "------> Checksum verified"
+
         echo "------> Extracting...   "
         tar -C "${tmpdir}" -x -f "${tmpdir}/${archive_name}"
 
