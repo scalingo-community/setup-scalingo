@@ -46,6 +46,7 @@ The action also accepts the following optional inputs:
 - `version` - The version of Scalingo CLI to install. If not provided, the action will install the latest version.
 - `app_name` - The name of the app to use. If not provided, the subsequent steps will try to use the `SCALINGO_APP` environment variable.
 - `git_remote` - Choose the name of Git remote to allow git operations (requires the `region` and `app_name` inputs). The default value is `scalingo`.
+- `github_token` - GitHub token used to authenticate the CLI download from GitHub releases and avoid the anonymous rate limit (e.g. `github_token: ${{ secrets.GITHUB_TOKEN }}`). If not provided, the download runs anonymously and may be rate-limited.
 
 
 For testing or debugging purpose, the following inputs can also be used:
