@@ -43,6 +43,8 @@ runs:
   steps:
     - name: Install Scalingo CLI
       run: |
+        set -euo pipefail
+
         echo "------> Installing Scalingo client..."
 
         if [ "x$DEBUG" = "xtrue" ] ; then
@@ -140,25 +142,27 @@ runs:
     - name: Configure Scalingo CLI
       shell: bash
       run: |
+        set -euo pipefail
+
         echo "------> Configuring Scalingo CLI"
 
-        echo "LOG_FILE=/dev/stdout" >> $GITHUB_ENV
+        echo "LOG_FILE=/dev/stdout" >> "$GITHUB_ENV"
 
         # Disable the update checker
-        echo "DISABLE_UPDATE_CHECKER=true" >> $GITHUB_ENV
+        echo "DISABLE_UPDATE_CHECKER=true" >> "$GITHUB_ENV"
         export DISABLE_UPDATE_CHECKER=true
-        echo "DISABLE_INTERACTIVE=true" >> $GITHUB_ENV
+        echo "DISABLE_INTERACTIVE=true" >> "$GITHUB_ENV"
         export DISABLE_INTERACTIVE=true
 
         # Configure development urls for debugging purposes
-        [[ -n "${UNSECURE_SSL}" ]] && echo "UNSECURE_SSL=${UNSECURE_SSL}" >> $GITHUB_ENV
-        [[ -n "${SCALINGO_API_URL}" ]] && echo "SCALINGO_API_URL=${SCALINGO_API_URL}" >> $GITHUB_ENV
-        [[ -n "${SCALINGO_AUTH_URL}" ]] && echo "SCALINGO_AUTH_URL=${SCALINGO_AUTH_URL}" >> $GITHUB_ENV
-        [[ -n "${SCALINGO_DB_URL}" ]] && echo "SCALINGO_DB_URL=${SCALINGO_DB_URL}" >> $GITHUB_ENV
-        [[ -n "${SCALINGO_SSH_HOST}" ]] && echo "SCALINGO_SSH_HOST=${SCALINGO_SSH_HOST}" >> $GITHUB_ENV
+        if [[ -n "${UNSECURE_SSL}" ]]; then echo "UNSECURE_SSL=${UNSECURE_SSL}" >> "$GITHUB_ENV"; fi
+        if [[ -n "${SCALINGO_API_URL}" ]]; then echo "SCALINGO_API_URL=${SCALINGO_API_URL}" >> "$GITHUB_ENV"; fi
+        if [[ -n "${SCALINGO_AUTH_URL}" ]]; then echo "SCALINGO_AUTH_URL=${SCALINGO_AUTH_URL}" >> "$GITHUB_ENV"; fi
+        if [[ -n "${SCALINGO_DB_URL}" ]]; then echo "SCALINGO_DB_URL=${SCALINGO_DB_URL}" >> "$GITHUB_ENV"; fi
+        if [[ -n "${SCALINGO_SSH_HOST}" ]]; then echo "SCALINGO_SSH_HOST=${SCALINGO_SSH_HOST}" >> "$GITHUB_ENV"; fi
 
         echo "------> Set the region to ${SCALINGO_REGION}"
-        echo "SCALINGO_REGION=${SCALINGO_REGION}" >> $GITHUB_ENV
+        echo "SCALINGO_REGION=${SCALINGO_REGION}" >> "$GITHUB_ENV"
 
         if [[ -n "${SCALINGO_API_TOKEN}" ]]; then
           echo "------> Log in to Scalingo with API token"
@@ -177,7 +181,7 @@ runs:
 
         if [[ -n "${SCALINGO_APP}" ]]; then
           echo "------> Set the default app to ${SCALINGO_APP}"
-          echo "SCALINGO_APP=${SCALINGO_APP}" >> $GITHUB_ENV
+          echo "SCALINGO_APP=${SCALINGO_APP}" >> "$GITHUB_ENV"
         fi
       env:
         SCALINGO_API_TOKEN: ${{ inputs.api_token }}
@@ -192,6 +196,8 @@ runs:
     - name: Configure Scalingo Git remote
       shell: bash
       run: |
+        set -euo pipefail
+
         echo "------> Configure Scalingo Git remote"
 
         if [ -z "$SCALINGO_APP" ]; then
