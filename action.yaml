@@ -200,12 +200,12 @@ runs:
 
         echo "------> Configure Scalingo Git remote"
 
-        if [ -z "$SCALINGO_APP" ]; then
+        if [ -z "${SCALINGO_APP:-}" ]; then
           echo "::warning::No app name. The git remote cannot be configured without an app name (input 'app_name'). Skipping git remote configuration."
           exit 0
         fi
 
-        if [ -z "$SCALINGO_REGION" ]; then
+        if [ -z "${SCALINGO_REGION:-}" ]; then
           echo "::warning::No region. The git remote cannot be configured without a region (input 'region'). Skipping git remote configuration."
           exit 0
         fi
