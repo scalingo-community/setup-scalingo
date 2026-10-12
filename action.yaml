@@ -63,11 +63,15 @@ runs:
           x86_64)
             arch=amd64
             ;;
-          aarch64)
+          aarch64|arm64)
             arch=arm64
             ;;
-          i686)
+          i686|i386)
             arch=386
+            ;;
+          *)
+            echo "::error::Unsupported architecture: $(uname -m). The Scalingo CLI is published for amd64, arm64 and 386. Check the runner architecture or pin a 'version' input matching an existing release asset." >&2
+            exit 1
             ;;
         esac
 
