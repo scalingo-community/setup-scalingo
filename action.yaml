@@ -21,6 +21,9 @@ inputs:
     description: 'Choose the name of Git remote to allow git operations (requires the `region` and `app_name` inputs)'
     required: false
     default: 'scalingo'
+  github_token:
+    description: 'GitHub token used to authenticate the CLI download from GitHub releases and avoid the anonymous rate limit. Pass secrets.GITHUB_TOKEN.'
+    required: false
 
   # Options for debugging or internal use
   scalingo_api_url:
