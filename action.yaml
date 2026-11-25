@@ -98,6 +98,13 @@ runs:
           exit 1
         fi
 
+        # Validate the version early: it is interpolated into the download URL,
+        # so anything outside 'latest' or a semver would produce a bogus request.
+        if [[ ! "$version" =~ ^(latest|[0-9]+\.[0-9]+\.[0-9]+)$ ]]; then
+          echo "::error::Invalid CLI version '$version'. Use 'latest' or a semver like 1.33.0." >&2
+          exit 1
+        fi
+
         echo "------> Version of the CLI to install: $version"
 
         dirname="scalingo_${version}_${os}_${arch}"
