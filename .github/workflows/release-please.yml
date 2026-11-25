@@ -19,7 +19,7 @@ jobs:
       # (release type, versioning strategy and changelog sections) lives in
       # release-please-config.json, with the current versions in
       # .release-please-manifest.json.
-      - uses: googleapis/release-please-action@v4
+      - uses: googleapis/release-please-action@v5
         id: release
         with:
           config-file: release-please-config.json
