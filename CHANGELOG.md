@@ -1,5 +1,23 @@
 # Changelog
 
+## [0.1.3](https://github.com/scalingo-community/setup-scalingo/compare/v0.1.2...v0.1.3) (2026-11-25)
+
+
+### 🐛 Bug fixes
+
+* **ci:** repair the release-please workflow (moving tags) ([#13](https://github.com/scalingo-community/setup-scalingo/issues/13)) ([1a68113](https://github.com/scalingo-community/setup-scalingo/commit/1a6811331c6aa0e3fdbaa3862bc4de3e5a4a6039))
+* enable strict shell mode in all steps ([#19](https://github.com/scalingo-community/setup-scalingo/issues/19)) ([735529f](https://github.com/scalingo-community/setup-scalingo/commit/735529f83f95f71e2e059fb1c796f8e58652125e))
+* explicit arm64 mapping and clear error for unsupported architectures ([#18](https://github.com/scalingo-community/setup-scalingo/issues/18)) ([537132a](https://github.com/scalingo-community/setup-scalingo/commit/537132a0df749c19c06d8483887ef062b7c875d7))
+* use mkdir -p so the action can run twice in the same job ([#16](https://github.com/scalingo-community/setup-scalingo/issues/16)) ([7572428](https://github.com/scalingo-community/setup-scalingo/commit/7572428c5c099b48502bedf2151a8f7015b427c0))
+* use runner temp dir and clean up the temp archive directory ([#17](https://github.com/scalingo-community/setup-scalingo/issues/17)) ([f16b897](https://github.com/scalingo-community/setup-scalingo/commit/f16b8976bacdeab251f6a192aa69f640988a6754))
+* validate the CLI version input before interpolating it into the download URL ([#21](https://github.com/scalingo-community/setup-scalingo/issues/21)) ([e5e0de4](https://github.com/scalingo-community/setup-scalingo/commit/e5e0de4c3fa061f5eaf285b8efee4a6ad2f6bd70))
+
+
+### 👷 Other changes
+
+* **deps:** bump googleapis/release-please-action from 4 to 5 ([#24](https://github.com/scalingo-community/setup-scalingo/issues/24)) ([6dd4641](https://github.com/scalingo-community/setup-scalingo/commit/6dd464171a85e940f5d438cdb50b79772c264fe6))
+* least privilege for tests and drop token-in-URL remote ([#23](https://github.com/scalingo-community/setup-scalingo/issues/23)) ([f2aa50b](https://github.com/scalingo-community/setup-scalingo/commit/f2aa50b78b3427dae2251fc5ff565e28c8bc9c6a))
+
 ## [0.1.2](https://github.com/scalingo-community/setup-scalingo/compare/v0.1.1...v0.1.2) (2026-10-08)
 
 
